@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Безпека в інтернеті</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+body{margin:0}
+
+/* Layout: одна «сцена» 16:9; з головного слайда — прямі переходи в розділи, назад — кнопка «До змісту» */
+:root{
+  --bg:#eef3f6; --stage:#ffffff; --fg:#14232e; --muted:#51656f; --line:#cfdbe2;
+  --accent:#0b7a75; --accent-fg:#ffffff; --warm:#d9480f; --tint:#e3f2f1;
+  --display:'Space Grotesk','Segoe UI',Arial,sans-serif; --body:'Inter','Segoe UI',Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c161d; --stage:#13222c; --fg:#e8f0f4; --muted:#9db1bc; --line:#2a3d49;
+  --accent:#4cc2ba; --accent-fg:#06201e; --warm:#ff8a5c; --tint:#173a3b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c161d; --stage:#13222c; --fg:#e8f0f4; --muted:#9db1bc; --line:#2a3d49;
+  --accent:#4cc2ba; --accent-fg:#06201e; --warm:#ff8a5c; --tint:#173a3b; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);
+  padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.deck{max-width:1100px;margin:0 auto}
+.stage{background:var(--stage);border:1px solid var(--line);border-radius:10px;aspect-ratio:16/9;overflow:hidden;position:relative}
+.slide{display:none;position:absolute;inset:0;flex-direction:column;padding:clamp(16px,3.4vw,44px);gap:clamp(8px,1.6vw,20px);min-width:0}
+.slide.active{display:flex;animation:enter .45s ease both}
+@keyframes enter{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.1}
+h1{font-size:clamp(24px,4.6vw,52px)}
+h2{font-size:clamp(20px,3.2vw,36px);color:var(--accent)}
+.lead{font-size:clamp(12px,1.7vw,20px);color:var(--muted);margin:0;max-width:60ch}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.btn{font:inherit;font-size:clamp(11px,1.4vw,15px);font-weight:500;border:1px solid var(--accent);color:var(--accent);background:transparent;
+  border-radius:6px;padding:6px 12px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--accent);color:var(--accent-fg)}
+.btn:focus-visible,.card:focus-visible,a:focus-visible{outline:3px solid var(--warm);outline-offset:2px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.6vw,18px);flex:1;min-height:0}
+.card{display:flex;flex-direction:column;justify-content:space-between;gap:8px;text-align:left;font:inherit;color:var(--fg);
+  background:var(--tint);border:1px solid var(--line);border-radius:8px;padding:clamp(10px,1.8vw,22px);cursor:pointer;
+  transition:transform .25s ease, border-color .25s ease;text-decoration:none;min-width:0}
+.card:hover{transform:scale(1.04);border-color:var(--accent)}
+.card b{font-family:var(--display);font-size:clamp(15px,2.3vw,26px)}
+.card span{font-size:clamp(11px,1.4vw,16px);color:var(--muted)}
+.card em{font-style:normal;font-size:clamp(11px,1.3vw,14px);color:var(--accent);font-weight:700}
+.body{display:grid;grid-template-columns:1.3fr 1fr;gap:clamp(10px,2.4vw,32px);flex:1;min-height:0;align-items:start}
+.body ul{margin:0;padding-left:1.1em;display:grid;gap:.5em;font-size:clamp(12px,1.8vw,21px)}
+.note{border-left:4px solid var(--warm);padding:6px 12px;font-size:clamp(11px,1.5vw,17px);color:var(--muted);margin:0}
+.note strong{color:var(--fg)}
+.pic{width:min(100%,260px);justify-self:center}
+.pic.small{width:min(100%,170px);justify-self:end}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.crumbs{font-size:clamp(10px,1.3vw,14px);color:var(--muted)}
+.help{margin:12px 0 0;font-size:13px;color:var(--muted);text-align:center}
+.print-link{display:none}
+@media (max-width:640px){
+  .stage{aspect-ratio:auto;min-height:560px}
+  .cards,.body{grid-template-columns:1fr}
+  .slide{overflow:auto}
+}
+@media (prefers-reduced-motion:reduce){.slide.active{animation:none}.card{transition:none}}
+@page{size:13.333in 7.5in;margin:0}
+@media print{
+  body{padding:0;background:#fff}
+  .deck{max-width:none}
+  .stage{border:0;border-radius:0;aspect-ratio:auto;overflow:visible}
+  .slide{display:flex!important;position:relative;width:13.333in;height:7.5in;page-break-after:always;break-after:page;
+    animation:none!important;padding:.55in;gap:.2in;background:#fff;color:#14232e;overflow:hidden}
+  .help,.btn[data-print="hide"]{display:none}
+  .print-link{display:block}
+  .slide{--stage:#fff;--fg:#14232e;--muted:#51656f;--line:#cfdbe2;--accent:#0b7a75;--tint:#e3f2f1;--warm:#d9480f}
+}
+</style>
+
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- ГОЛОВНИЙ СЛАЙД -->
+    <section class="slide" id="home" data-title="Зміст">
+      <div class="top"><span class="crumbs">Інтерактивна презентація · ЛР № 7</span></div>
+      <h1>Безпека в інтернеті</h1>
+      <p class="lead">Оберіть розділ: з цього слайда можна одразу перейти до будь-якого з трьох розділів і повернутися назад.</p>
+      <div class="cards" id="cards">
+        <a class="card" href="#phishing"><em>Розділ</em><b>Фішинг</b><span>Як упізнати підроблений лист або сайт</span></a>
+        <a class="card" href="#passwords"><em>Розділ</em><b>Паролі</b><span>Надійні паролі та менеджери паролів</span></a>
+        <a class="card" href="#devices"><em>Розділ</em><b>Захист пристроїв</b><span>Оновлення, антивірус, резервні копії</span></a>
+      </div>
+    </section>
+
+    <!-- ПАРОЛІ -->
+    <section class="slide" id="passwords" data-title="Паролі">
+      <div class="top"><span class="crumbs">Зміст › Паролі</span><a class="btn" href="#home">← До змісту</a></div>
+      <h2>Паролі</h2>
+      <div class="body">
+        <ul>
+          <li>Довжина важливіша за складність: від 12 символів.</li>
+          <li>Один сервіс — один унікальний пароль.</li>
+          <li>Двоетапна автентифікація закриває вхід, навіть якщо пароль витік.</li>
+        </ul>
+        <svg class="pic" viewBox="0 0 200 200" role="img" aria-label="Ключ і замок">
+          <circle cx="100" cy="100" r="92" fill="var(--tint)" stroke="var(--line)" stroke-width="2"/>
+          <rect x="62" y="92" width="76" height="56" rx="8" fill="var(--accent)"/>
+          <path d="M76 92V76a24 24 0 0 1 48 0v16" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round"/>
+          <circle cx="100" cy="116" r="8" fill="var(--stage)"/><rect x="96" y="118" width="8" height="18" rx="3" fill="var(--stage)"/>
+        </svg>
+      </div>
+      <p class="note"><strong>Перевірте себе:</strong> пароль «qwerty123» підбирається за секунди.</p>
+      <div class="row"><a class="btn" href="#password-manager">Вкладений підрозділ: менеджери паролів →</a></div>
+    </section>
+
+    <!-- ПІДРОЗДІЛ -->
+    <section class="slide" id="password-manager" data-title="Менеджери паролів">
+      <div class="top"><span class="crumbs">Зміст › Паролі › Менеджери паролів</span>
+        <span class="row"><a class="btn" href="#passwords">← До розділу «Паролі»</a><a class="btn" href="#home">До змісту</a></span></div>
+      <h2>Менеджери паролів</h2>
+      <p class="lead">Менеджер зберігає всі паролі в зашифрованому сховищі й відкривається одним головним паролем.</p>
+      <div class="body">
+        <ul>
+          <li>Генерує довгі випадкові паролі.</li>
+          <li>Підставляє їх лише на справжньому сайті.</li>
+          <li>Синхронізує сховище між телефоном і комп’ютером.</li>
+        </ul>
+        <p class="note"><strong>Відео для перегляду:</strong> <a href="https://www.youtube.com/results?search_query=password+manager+explained" target="_blank" rel="noopener">пошук відео про менеджери паролів</a></p>
+      </div>
+    </section>
+
+    <!-- ФІШИНГ -->
+    <section class="slide" id="phishing" data-title="Фішинг">
+      <div class="top"><span class="crumbs">Зміст › Фішинг</span><a class="btn" href="#home">← До змісту</a></div>
+      <h2>Фішинг</h2>
+      <div class="body">
+        <ul>
+          <li>Терміновість: «акаунт буде заблоковано за годину».</li>
+          <li>Адреса відправника лише схожа на справжню.</li>
+          <li>Посилання веде не на офіційний домен.</li>
+          <li>Вкладення, яке ви не очікували.</li>
+        </ul>
+        <svg class="pic small" viewBox="0 0 200 200" role="img" aria-label="Гачок над листом">
+          <rect x="30" y="86" width="140" height="90" rx="8" fill="var(--tint)" stroke="var(--accent)" stroke-width="4"/>
+          <path d="M30 94l70 46 70-46" fill="none" stroke="var(--accent)" stroke-width="4"/>
+          <path d="M100 14v44a16 16 0 1 1-16 16" fill="none" stroke="var(--warm)" stroke-width="7" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="note"><strong>Правило:</strong> не переходьте за посиланням із листа, а відкрийте сайт самостійно.</p>
+    </section>
+
+    <!-- ЗАХИСТ ПРИСТРОЇВ -->
+    <section class="slide" id="devices" data-title="Захист пристроїв">
+      <div class="top"><span class="crumbs">Зміст › Захист пристроїв</span><a class="btn" href="#home">← До змісту</a></div>
+      <h2>Захист пристроїв</h2>
+      <div class="body">
+        <ul>
+          <li>Установлюйте оновлення системи та програм.</li>
+          <li>Використовуйте антивірус і вбудований брандмауер.</li>
+          <li>Робіть резервні копії за правилом 3-2-1.</li>
+          <li>Блокуйте екран і шифруйте диск.</li>
+        </ul>
+        <svg class="pic" viewBox="0 0 200 200" role="img" aria-label="Щит">
+          <path d="M100 18l66 24v50c0 44-28 76-66 90-38-14-66-46-66-90V42z" fill="var(--accent)"/>
+          <path d="M70 100l22 22 40-46" fill="none" stroke="var(--stage)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </section>
+
+    </div>
+  <p class="help">Також працюють клавіші ← → та Home. Порядок карток на головному слайді можна змінити кнопкою нижче.</p>
+  <p class="help"><button class="btn" id="reorder" type="button" data-print="hide">Змінити порядок розділів</button></p>
+</div>
+
+<script>
+(function(){
+  var ids=['home','passwords','password-manager','phishing','devices'];
+  var linear=['home','phishing','passwords','password-manager','devices'];
+  function show(){
+    var h=(location.hash||'').replace('#','');
+    if(ids.indexOf(h)<0) h='home';
+    document.querySelectorAll('.slide').forEach(function(s){ s.classList.toggle('active', s.id===h); });
+    var s=document.getElementById(h); if(s) document.title='Безпека в інтернеті · '+s.dataset.title;
+  }
+  window.addEventListener('hashchange',show); show();
+  document.addEventListener('keydown',function(e){
+    var h=(location.hash||'#home').replace('#',''); var i=linear.indexOf(h); if(i<0) i=0;
+    if(e.key==='ArrowRight') location.hash=linear[Math.min(i+1,linear.length-1)];
+    if(e.key==='ArrowLeft') location.hash=linear[Math.max(i-1,0)];
+    if(e.key==='Home') location.hash='home';
+  });
+  var cards=document.getElementById('cards'), flipped=false;
+  document.getElementById('reorder').addEventListener('click',function(){
+    flipped=!flipped; var a=[].slice.call(cards.children).reverse();
+    a.forEach(function(c){cards.appendChild(c);});
+  });
+})();
+</script>
+
+</body>
+</html>
